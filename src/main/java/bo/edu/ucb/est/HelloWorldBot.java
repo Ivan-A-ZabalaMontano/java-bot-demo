@@ -71,6 +71,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		else if(validarOpcion(texto)==2)
     		{
     			message.setText("Funcionalidad no implementada, intente otro día.");
+    			currentMenu=0;
     		}
     		else
     		{
@@ -78,7 +79,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
         				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=0;
+    			currentMenu=1;
     		}
     	}
     	else if(currentMenu==2)
@@ -94,7 +95,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
         				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=0;
+    			currentMenu=1;
     		}
     	}
     	else if(currentMenu==3) 
@@ -110,7 +111,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
         				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=0;
+    			currentMenu=1;
     		}
     	}
     	try 
