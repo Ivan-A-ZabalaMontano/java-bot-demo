@@ -5,6 +5,7 @@
  */
 package bo.edu.ucb.est;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -15,10 +16,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
  * @author ecampohermoso
  */
 public class HelloWorldBot extends TelegramLongPollingBot {
+	private int lastMenu=0;
+	private int currentMenu=0;
+	private ArrayList <Integer>nums;
+	
+	
+	public HelloWorldBot() 
+	{
+		lastMenu=0;
+		currentMenu=0;
+		nums= new ArrayList<Integer>();
+	}
 
     @Override
     public String getBotToken() {
-        return "";
+        return "1970441371:AAGIEE7oMuWkKpjykhbhY_RobZs1SSIwFOI";
     }
 
     @Override
@@ -26,46 +38,119 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         System.out.println("Llego mensaje: " + update.toString());
         if(update.hasMessage()) { // Verificamos que tenga mensaje
             // Creo el objeto para enviar un mensaje
+        	System.out.println("El usuario se encuentra en el menu: "+currentMenu);
             SendMessage message = new SendMessage();
             message.setChatId(update.getMessage().getChatId().toString()); //Define a quien le vamos a enviar el mensaje
-            if(update.getMessage().getText().contains(" y "))
-            {
-            	System.out.println("Mando numeros");
-            	System.out.println("El usuario Mando: "+update.getMessage().getText());
-            	
-            	message.setText(sumarNumeros(update.getMessage().getText()));
-            	
-            }
-            else
-            {
-            	System.out.println("No mando numeros");
-            	message.setText("Hola " + update.getMessage().getFrom().getFirstName()+", para realizar una suma ingresa dos numeros con el siguiente formato: 5 y 3");
-            }
-            try {
-                execute(message); // Envia el mensaje
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            String texto=update.getMessage().getText();
+           mandarMensaje(texto, update, message);
         }
     }
     @Override
     public String getBotUsername() {
         return "ISUMA_BOT";
     }
-    public String sumarNumeros(String numeros)
+    public void mandarMensaje(String texto, Update update, SendMessage message)
     {
-    	int n1=0;
-    	int n2=0;
+ 
+    	if(currentMenu==0)
+    	{
+    		message.setText("Bienvenido al Bot Calculadora."
+    				+ "\nSeleccione una de las siguientes opciones:"
+    				+ "\n1. Sumar dos números."
+    				+ "\n2. Calcular la serie fibonacci.");
+    		currentMenu++;
+    		nums.clear();
+    	}
+    	else if(currentMenu==1) 
+    	{
+    		if(validarOpcion(texto)==1)
+    		{
+    			message.setText("Ingrese el primer número: ");
+    			 currentMenu++;
+    		}
+    		else if(validarOpcion(texto)==2)
+    		{
+    			message.setText("Funcionalidad no implementada, intente otro día.");
+    		}
+    		else
+    		{
+    			message.setText("Bienvenido al Bot Calculadora."
+        				+ "\nSeleccione una de las siguientes opciones:"
+        				+ "\n1. Sumar dos números."
+        				+ "\n2. Calcular la serie fibonacci.");
+    			currentMenu=0;
+    		}
+    	}
+    	else if(currentMenu==2)
+    	{
+    		if(validarNumeros(texto))
+    		{
+    			message.setText("Ingrese el segundo número: ");
+    			currentMenu++;
+    		}
+    		else
+    		{
+    			message.setText("Bienvenido al Bot Calculadora."
+        				+ "\nSeleccione una de las siguientes opciones:"
+        				+ "\n1. Sumar dos números."
+        				+ "\n2. Calcular la serie fibonacci.");
+    			currentMenu=0;
+    		}
+    	}
+    	else if(currentMenu==3) 
+    	{
+    		if(validarNumeros(texto))
+    		{
+    			message.setText("El resultado es: "+(nums.get(0)+nums.get(1)));
+    			currentMenu=0;
+    		}
+    		else
+    		{
+    			message.setText("Bienvenido al Bot Calculadora."
+        				+ "\nSeleccione una de las siguientes opciones:"
+        				+ "\n1. Sumar dos números."
+        				+ "\n2. Calcular la serie fibonacci.");
+    			currentMenu=0;
+    		}
+    	}
+    	try 
+    	{
+    		execute(message); // Envia el mensaje
+    	}catch (TelegramApiException e) 
+    		{
+    	    	e.printStackTrace();
+    	    }
+    	
+    }
+
+    public boolean validarNumeros(String texto)
+    {
+    	int n;
     	try
     	{
-    	String[] vec;
-    	vec=numeros.split(" y ");
-    	n1=Integer.parseInt(vec[0]);
-    	n2=Integer.parseInt(vec[1]);
+    		n=Integer.parseInt(texto);
+    		
     	}catch(Exception e)
     	{
-    		return "Los valores ingresados no son correctos. Vuelva a ingresar los valores con el formato correspondiente por favor";
+    		return false;
     	}
-    	return("La suma es: "+new Suma(n1,n2).realizarSuma());
+    	nums.add(n);
+    	return true;
+    }
+    public int validarOpcion(String texto) 
+    {
+    	int n;
+    	try
+    	{
+    		n=Integer.parseInt(texto);
+    	}catch(Exception e)
+    	{
+    		return 0;
+    	}
+    	return n;
+    }
+    public void sumarNumeros(String numeros)
+    {
+    	
     }
 }
