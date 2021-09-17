@@ -16,14 +16,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
  * @author ecampohermoso
  */
 public class HelloWorldBot extends TelegramLongPollingBot {
-	private int lastMenu=0;
 	private int currentMenu=0;
 	private ArrayList <Integer>nums;
 	
 	
 	public HelloWorldBot() 
 	{
-		lastMenu=0;
 		currentMenu=0;
 		nums= new ArrayList<Integer>();
 	}
@@ -61,7 +59,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		currentMenu++;
     		nums.clear();
     	}
-    	else if(currentMenu==1) 
+    	if(currentMenu==1) 
     	{
     		if(validarOpcion(texto)==1)
     		{
@@ -75,6 +73,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		}
     		else
     		{
+    			nums.clear();
     			message.setText("Bienvenido al Bot Calculadora."
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
@@ -91,6 +90,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		}
     		else
     		{
+    			nums.clear();
     			message.setText("Bienvenido al Bot Calculadora."
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
@@ -107,6 +107,7 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		}
     		else
     		{
+    			nums.clear();
     			message.setText("Bienvenido al Bot Calculadora."
         				+ "\nSeleccione una de las siguientes opciones:"
         				+ "\n1. Sumar dos números."
@@ -149,9 +150,5 @@ public class HelloWorldBot extends TelegramLongPollingBot {
     		return 0;
     	}
     	return n;
-    }
-    public void sumarNumeros(String numeros)
-    {
-    	
     }
 }
