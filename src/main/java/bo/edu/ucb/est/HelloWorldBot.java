@@ -18,7 +18,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class HelloWorldBot extends TelegramLongPollingBot {
 	private int currentMenu=0;
 	private ArrayList <Integer>nums;
-	
+	private String lastMSG="";
+	private String[] mensajes= {"Bienvenido al Bot Calculadora."
+			+ "\nSeleccione una de las siguientes opciones:"
+			+ "\n1. Sumar dos números."
+			+ "\n2. Calcular la serie fibonacci.",
+			"Ingrese el primer número: ", 
+			"Ingrese el segundo número: "};
 	
 	public HelloWorldBot() 
 	{
@@ -36,11 +42,14 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         System.out.println("Llego mensaje: " + update.toString());
         if(update.hasMessage()) { // Verificamos que tenga mensaje
             // Creo el objeto para enviar un mensaje
-        	System.out.println("El usuario se encuentra en el menu: "+currentMenu);
             SendMessage message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId().toString()); //Define a quien le vamos a enviar el mensaje
+            //Define a quien le vamos a enviar el mensaje
+            message.setChatId(update.getMessage().getChatId().toString()); 
+            // Obtiene el mensaje del usuario
             String texto=update.getMessage().getText();
-           mandarMensaje(texto, update, message);
+          
+            mandarMensaje(texto,update,message);
+            
         }
     }
     @Override
@@ -48,107 +57,89 @@ public class HelloWorldBot extends TelegramLongPollingBot {
         return "ISUMA_BOT";
     }
     public void mandarMensaje(String texto, Update update, SendMessage message)
-    {
- 
-    	if(currentMenu==0)
+    { 	
+    	SendMessage message2 = new SendMessage();
+    	message2.setChatId(update.getMessage().getChatId().toString());
+    	message2.setText("");
+    	System.out.println("lastMSG: "+lastMSG);
+    	for(int i=0;i<mensajes.length;i++)
     	{
-    		message.setText("Bienvenido al Bot Calculadora."
-    				+ "\nSeleccione una de las siguientes opciones:"
-    				+ "\n1. Sumar dos números."
-    				+ "\n2. Calcular la serie fibonacci.");
-    		currentMenu++;
-    		nums.clear();
-    	}
-    	if(currentMenu==1) 
-    	{
-    		if(validarOpcion(texto)==1)
+    		if(lastMSG.equals(""))
     		{
-    			message.setText("Ingrese el primer número: ");
-    			 currentMenu++;
-    		}
-    		else if(validarOpcion(texto)==2)
-    		{
-    			message.setText("Funcionalidad no implementada, intente otro día.");
-    			currentMenu=0;
-    		}
-    		else
-    		{
-    			nums.clear();
-    			message.setText("Bienvenido al Bot Calculadora."
-        				+ "\nSeleccione una de las siguientes opciones:"
-        				+ "\n1. Sumar dos números."
-        				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=1;
-    		}
-    	}
-    	else if(currentMenu==2)
-    	{
-    		if(validarNumeros(texto))
-    		{
-    			message.setText("Ingrese el segundo número: ");
-    			currentMenu++;
-    		}
-    		else
-    		{
-    			nums.clear();
-    			message.setText("Bienvenido al Bot Calculadora."
-        				+ "\nSeleccione una de las siguientes opciones:"
-        				+ "\n1. Sumar dos números."
-        				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=1;
-    		}
-    	}
-    	else if(currentMenu==3) 
-    	{
-    		if(validarNumeros(texto))
-    		{
-    			message.setText("El resultado es: "+(nums.get(0)+nums.get(1)));
-    			currentMenu=0;
-    		}
-    		else
-    		{
-    			nums.clear();
-    			message.setText("Bienvenido al Bot Calculadora."
-        				+ "\nSeleccione una de las siguientes opciones:"
-        				+ "\n1. Sumar dos números."
-        				+ "\n2. Calcular la serie fibonacci.");
-    			currentMenu=1;
-    		}
-    	}
-    	try 
-    	{
-    		execute(message); // Envia el mensaje
-    	}catch (TelegramApiException e) 
-    		{
-    	    	e.printStackTrace();
-    	    }
-    	
-    }
-
-    public boolean validarNumeros(String texto)
-    {
-    	int n;
-    	try
-    	{
-    		n=Integer.parseInt(texto);
     		
-    	}catch(Exception e)
-    	{
-    		return false;
+    			message.setText(mensajes[0]);
+    			break;
+    		}
+    		else if(lastMSG.equals(mensajes[i]))
+    		{
+    			if(lastMSG.equals(mensajes[0]) && validarEntrada(texto)==2)
+    			{
+    				message.setText("Funcionalidad no implementada, intente otro día.");
+    				break;
+    			}
+    			else if(lastMSG.contains("segundo") && validarEntrada(texto)!=-1)
+    			{
+    				int res=nums.get(0)+nums.get(1);
+    				message.setText("El resultado es: "+res);
+    				break;
+    			}
+    			
+    			else if(validarEntrada(texto)!=-1)
+    			{
+    				message.setText(mensajes[i+1]);
+    				break;
+    			}
+    			else
+    			{
+    				message.setText(mensajes[0]);
+    				nums.clear();
+    				break;
+    			}
+    		} 
     	}
-    	nums.add(n);
-    	return true;
-    }
-    public int validarOpcion(String texto) 
-    {
-    	int n;
+    	if(message.getText().contains("El resultado es: ") || message.getText().contains("Funcionalidad"))
+    	{
+			System.out.println("Mensaje final");
+			message2.setText(mensajes[0]);
+			nums.clear();
+    	}
     	try
     	{
-    		n=Integer.parseInt(texto);
-    	}catch(Exception e)
-    	{
-    		return 0;
+    		
+    		execute(message);
+    		lastMSG=message.getText();
+    		if(!message2.getText().equals(""))
+    		{
+    			execute(message2);
+    			lastMSG=message2.getText();
+    		}
     	}
-    	return n;
+    	catch(TelegramApiException e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    public int validarEntrada(String entrada)
+    {
+    	int valor;
+    	try
+    	{
+    		valor=Integer.parseInt(entrada);
+    	}
+    	catch(Exception e)
+    	{
+    		return -1;
+    	}
+    	
+    	if(lastMSG.equals(mensajes[0]) && valor>0 && valor<3)
+    	{
+    		return valor;
+    	}
+    	else if(lastMSG.equals(mensajes[1]) || lastMSG.equals(mensajes[2]))
+    	{
+    		nums.add(valor);
+    		return valor;
+    	}
+    	return -1;
     }
 }
